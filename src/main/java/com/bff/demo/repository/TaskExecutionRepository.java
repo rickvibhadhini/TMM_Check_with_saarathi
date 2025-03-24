@@ -1,9 +1,9 @@
 package com.bff.demo.repository;
 
 
-import com.bff.demo.modal.ApplicantType;
-import com.bff.demo.modal.TaskDefinition;
-import com.bff.demo.modal.TaskExecution;
+import com.bff.demo.model.ApplicantType;
+import com.bff.demo.model.TaskDefinition;
+import com.bff.demo.model.TaskExecution;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

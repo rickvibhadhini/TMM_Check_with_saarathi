@@ -1,7 +1,7 @@
 package com.bff.demo.repository.applicationActivityLogRepository;
 
 
-import com.bff.demo.modal.applicationActivityLogModel.TaskExecutionTimeEntity;
+import com.bff.demo.model.applicationActivityLogModel.TaskExecutionTimeEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

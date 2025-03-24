@@ -1,6 +1,6 @@
 package com.bff.demo.response.applicationActivityLog;
 
-import com.bff.demo.modal.TaskDefinition;
+import com.bff.demo.model.TaskDefinition;
 import lombok.Data;
 
 import java.time.LocalDateTime;

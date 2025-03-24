@@ -1,4 +1,4 @@
-package com.bff.demo.modal;
+package com.bff.demo.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -57,7 +57,7 @@ public class TaskExecutionLog {
 
     private String actorId;
 
-    private com.bff.demo.modal.ApplicantType applicantType;
+    private com.bff.demo.model.ApplicantType applicantType;
 
     private String applicantId;
 
@@ -75,7 +75,7 @@ public class TaskExecutionLog {
 
     private LocalDateTime skippedAt;
 
-    private com.bff.demo.modal.SkippedReason skippedReason;
+    private com.bff.demo.model.SkippedReason skippedReason;
 
     private Map<String, String> inputResourceConfig;
 

@@ -1,7 +1,7 @@
 package com.bff.demo.repository;
 
 
-import com.bff.demo.modal.TaskExecutionLog;
+import com.bff.demo.model.TaskExecutionLog;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

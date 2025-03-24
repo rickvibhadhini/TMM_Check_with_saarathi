@@ -1,9 +1,9 @@
 package com.bff.demo.applicationActivityLog;
 
 
-import com.bff.demo.modal.TaskExecution;
-import com.bff.demo.modal.applicationActivityLogModel.SubTaskEntity;
-import com.bff.demo.modal.applicationActivityLogModel.TaskExecutionTimeEntity;
+import com.bff.demo.model.TaskExecution;
+import com.bff.demo.model.applicationActivityLogModel.SubTaskEntity;
+import com.bff.demo.model.applicationActivityLogModel.TaskExecutionTimeEntity;
 import com.bff.demo.repository.TaskExecutionRepository;
 import com.bff.demo.repository.applicationActivityLogRepository.TaskExecutionTimeRepository;
 import lombok.RequiredArgsConstructor;

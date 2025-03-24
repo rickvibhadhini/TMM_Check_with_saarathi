@@ -1,4 +1,4 @@
-package com.bff.demo.modal.applicationActivityLogModel;
+package com.bff.demo.model.applicationActivityLogModel;
 
 import lombok.Data;
 

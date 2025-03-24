@@ -1,4 +1,4 @@
-package com.bff.demo.modal;
+package com.bff.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class TaskDefinition {
 
     private EntityType entityType;
 
-    private com.bff.demo.modal.ApplicantType applicantType;
+    private com.bff.demo.model.ApplicantType applicantType;
 
     @Builder.Default
     private TaskStatus status = TaskStatus.NEW;

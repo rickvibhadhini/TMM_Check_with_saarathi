@@ -1,10 +1,10 @@
 package com.bff.demo.applicationActivityLog;
 
-import com.bff.demo.modal.SendbackConfig;
-import com.bff.demo.modal.SendbackMetadata;
-import com.bff.demo.modal.TaskExecutionLog;
-import com.bff.demo.modal.applicationActivityLogModel.SubTaskEntity;
-import com.bff.demo.modal.applicationActivityLogModel.TaskExecutionTimeEntity;
+import com.bff.demo.model.SendbackConfig;
+import com.bff.demo.model.SendbackMetadata;
+import com.bff.demo.model.TaskExecutionLog;
+import com.bff.demo.model.applicationActivityLogModel.SubTaskEntity;
+import com.bff.demo.model.applicationActivityLogModel.TaskExecutionTimeEntity;
 import com.bff.demo.repository.SendbackConfigRepository;
 import com.bff.demo.repository.TaskExecutionLogRepository;
 import com.bff.demo.repository.applicationActivityLogRepository.TaskExecutionTimeRepository;
@@ -172,15 +172,27 @@ public class ApplicationActivityLogService {
         return funnelData;
     }
 
-    private Map<String, List<TaskResponse>> buildSendbackTasksResponse(List<TaskExecutionLog> sendbackTasks,
-                                                                       Map<String, SubTaskEntity> taskMetadata) {
+    private Map<String, Map<String, Map<String, TaskResponse>>> buildSendbackTasksResponse(
+            List<TaskExecutionLog> sendbackTasks, Map<String, SubTaskEntity> taskMetadata) {
         return sendbackTasks.stream()
                 .sorted(Comparator.comparing(TaskExecutionLog::getUpdatedAt))
                 .collect(Collectors.groupingBy(
-                        task -> Optional.ofNullable(task.getRequestId()).orElse("UNKNOWN_REQUEST"),
-                        Collectors.mapping(applicationLog -> createTaskResponse(
-                                        Collections.singletonList(applicationLog), taskMetadata, true),
-                                Collectors.toList())
+                        task -> Optional.ofNullable(task.getSendbackMetadata())
+                                .map(SendbackMetadata::getKey)
+                                .orElse("UNKNOWN_KEY"),
+                        Collectors.groupingBy(
+                                task -> {
+                                    SendbackMetadata metadata = task.getSendbackMetadata();
+                                    return metadata != null ? metadata.getSourceLoanStage() + "_" + metadata.getSourceSubModule() : "UNKNOWN_STAGE_MODULE";
+                                },
+                                Collectors.groupingBy(
+                                        this::fetchTargetTaskId,
+                                        Collectors.collectingAndThen(
+                                                Collectors.toList(),
+                                                logs -> createTaskResponse(logs, taskMetadata, true)
+                                        )
+                                )
+                        )
                 ));
     }
 
@@ -211,6 +223,7 @@ public class ApplicationActivityLogService {
             return null;
         }
     }
+
 
     private TaskResponse createTaskResponse(List<TaskExecutionLog> logs,
                                             Map<String, SubTaskEntity> taskMetadata,
@@ -261,6 +274,7 @@ public class ApplicationActivityLogService {
         }
         return null;
     }
+
 
     private String fetchSourceModule(TaskExecutionLog applicationLog) {
         log.info("[fetchSourceModule] Fetching source module for log: {}", applicationLog.getTaskId());

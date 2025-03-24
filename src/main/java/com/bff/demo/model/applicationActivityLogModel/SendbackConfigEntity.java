@@ -1,4 +1,4 @@
-package com.bff.demo.modal.applicationActivityLogModel;//package com.cars24.fintech.bff.model.applicationActivityLogModel;
+package com.bff.demo.model.applicationActivityLogModel;//package com.cars24.fintech.bff.model.applicationActivityLogModel;
 //
 //import lombok.Data;
 //import org.springframework.data.annotation.Id;

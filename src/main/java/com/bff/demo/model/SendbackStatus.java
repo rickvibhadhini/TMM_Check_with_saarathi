@@ -1,4 +1,4 @@
-package com.bff.demo.modal;
+package com.bff.demo.model;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-package com.bff.demo.modal;
+package com.bff.demo.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
