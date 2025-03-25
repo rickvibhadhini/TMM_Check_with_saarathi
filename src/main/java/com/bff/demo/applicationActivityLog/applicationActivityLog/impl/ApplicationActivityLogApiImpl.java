@@ -4,6 +4,7 @@ package com.bff.demo.applicationActivityLog.applicationActivityLog.impl;
 import com.bff.demo.applicationActivityLog.ApplicationActivityLogService;
 import com.bff.demo.applicationActivityLog.applicationActivityLog.ApplicationActivityLogApi;
 import com.bff.demo.response.applicationActivityLog.APIResponse;
+import com.bff.demo.response.applicationActivityLog.TasksGroupedByFunnelDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,9 +19,9 @@ public class ApplicationActivityLogApiImpl implements ApplicationActivityLogApi 
     private final ApplicationActivityLogService applicationService;
 
     @Override
-    public APIResponse<Map<String, Object>> getTasksByApplicationId(String applicationId) {
+    public APIResponse<TasksGroupedByFunnelDTO> getTasksByApplicationId(String applicationId) {
         log.info("Fetching tasks for applicationId: {}", applicationId);
-        Map<String, Object> tasksByApplicationId = applicationService.getTasksGroupedByFunnel(applicationId);
+        TasksGroupedByFunnelDTO tasksByApplicationId = applicationService.getTasksGroupedByFunnel(applicationId);
         return APIResponse.ok(tasksByApplicationId);
     }
 }

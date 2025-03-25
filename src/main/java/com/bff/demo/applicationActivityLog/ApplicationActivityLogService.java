@@ -8,9 +8,7 @@ import com.bff.demo.model.applicationActivityLogModel.TaskExecutionTimeEntity;
 import com.bff.demo.repository.SendbackConfigRepository;
 import com.bff.demo.repository.TaskExecutionLogRepository;
 import com.bff.demo.repository.applicationActivityLogRepository.TaskExecutionTimeRepository;
-import com.bff.demo.response.applicationActivityLog.StatusLogResponse;
-import com.bff.demo.response.applicationActivityLog.TaskDetailsResponse;
-import com.bff.demo.response.applicationActivityLog.TaskResponse;
+import com.bff.demo.response.applicationActivityLog.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,7 @@ public class ApplicationActivityLogService {
     private final TaskExecutionTimeRepository taskExecutionTimeRepository;
     private final SendbackConfigRepository sendbackConfigRepository;
 
-    public Map<String, Object> getTasksGroupedByFunnel(String applicationId) {
+    public TasksGroupedByFunnelDTO getTasksGroupedByFunnel(String applicationId) {
         log.info("[getTasksGroupedByFunnel] Fetching list view tasks for applicationId: {}", applicationId);
 
         // Fetch data
@@ -46,19 +44,12 @@ public class ApplicationActivityLogService {
         // Get task metadata
         Map<String, SubTaskEntity> taskMetadata = getAllSubTaskEntities(taskExecutionTimeEntity);
 
-        // Build response
-        Map<String, Object> response = new LinkedHashMap<>();
-
-        // Add funnel tasks
-        response.put("tasksGroupedByFunnel", buildFunnelTasksResponse(regularTasks, taskMetadata));
-
-        // Add sendback tasks
-        response.put("sendbackTasks", buildSendbackTasksResponse(sendbackTasks, taskMetadata));
-
-        // Add latest task state
-        response.put("latestTaskState", buildLatestTaskStateResponse(tasks, taskMetadata));
-
-        return response;
+        // Build response using DTO
+        return TasksGroupedByFunnelDTO.builder()
+                .tasksGroupedByFunnel(buildFunnelTasksResponse(regularTasks, taskMetadata))
+                .sendbackTasks(buildSendbackTasksResponse(sendbackTasks, taskMetadata))
+                .latestTaskState(buildLatestTaskStateResponse(tasks, taskMetadata))
+                .build();
     }
 
     private List<TaskExecutionLog> filterSendbackTasks(List<TaskExecutionLog> tasks) {
@@ -100,8 +91,8 @@ public class ApplicationActivityLogService {
                 ));
     }
 
-    private LinkedHashMap<String, Object> buildFunnelTasksResponse(List<TaskExecutionLog> regularTasks,
-                                                                   Map<String, SubTaskEntity> taskMetadata) {
+    private LinkedHashMap<String, FunnelDataDTO> buildFunnelTasksResponse(List<TaskExecutionLog> regularTasks,
+                                                                          Map<String, SubTaskEntity> taskMetadata) {
         // Get funnel order information
         Map<String, Integer> funnelMinOrders = calculateFunnelMinOrders(regularTasks);
 
@@ -112,11 +103,10 @@ public class ApplicationActivityLogService {
         List<String> sortedFunnels = sortFunnelsByOrder(funnelMinOrders);
 
         // Build response
-        LinkedHashMap<String, Object> tasksGroupedByFunnel = new LinkedHashMap<>();
+        LinkedHashMap<String, FunnelDataDTO> tasksGroupedByFunnel = new LinkedHashMap<>();
 
         for (String funnel : sortedFunnels) {
-            Map<String, Object> funnelData = buildFunnelData(funnel, tasksByFunnelAndId, taskMetadata);
-            tasksGroupedByFunnel.put(funnel, funnelData);
+            tasksGroupedByFunnel.put(funnel, buildFunnelData(funnel, tasksByFunnelAndId, taskMetadata));
         }
 
         return tasksGroupedByFunnel;
@@ -152,9 +142,9 @@ public class ApplicationActivityLogService {
                 .toList();
     }
 
-    private Map<String, Object> buildFunnelData(String funnel,
-                                                Map<String, Map<String, List<TaskExecutionLog>>> tasksByFunnelAndId,
-                                                Map<String, SubTaskEntity> taskMetadata) {
+    private FunnelDataDTO buildFunnelData(String funnel,
+                                          Map<String, Map<String, List<TaskExecutionLog>>> tasksByFunnelAndId,
+                                          Map<String, SubTaskEntity> taskMetadata) {
         List<TaskResponse> funnelTasks = tasksByFunnelAndId.getOrDefault(funnel, Collections.emptyMap())
                 .entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.comparing(list -> list.get(0).getOrder())))
@@ -164,12 +154,11 @@ public class ApplicationActivityLogService {
         long totalDuration = funnelTasks.stream().mapToLong(TaskResponse::getDuration).sum();
         log.info("[buildFunnelData] Calculated total duration {} for funnel {}", totalDuration, funnel);
 
-        Map<String, Object> funnelData = new LinkedHashMap<>();
-        funnelData.put("funnel", funnel);
-        funnelData.put("funnelDuration", totalDuration);
-        funnelData.put("tasks", funnelTasks);
-
-        return funnelData;
+        return FunnelDataDTO.builder()
+                .funnel(funnel)
+                .funnelDuration(totalDuration)
+                .tasks(funnelTasks)
+                .build();
     }
 
     private Map<String, Map<String, Map<String, TaskResponse>>> buildSendbackTasksResponse(
@@ -196,8 +185,8 @@ public class ApplicationActivityLogService {
                 ));
     }
 
-    private Map<String, Object> buildLatestTaskStateResponse(List<TaskExecutionLog> tasks,
-                                                             Map<String, SubTaskEntity> taskMetadata) {
+    private LatestTaskStateDTO buildLatestTaskStateResponse(List<TaskExecutionLog> tasks,
+                                                            Map<String, SubTaskEntity> taskMetadata) {
         TaskExecutionLog latestLog = tasks.stream()
                 .max(Comparator.comparing(TaskExecutionLog::getUpdatedAt))
                 .orElse(null);
@@ -206,24 +195,23 @@ public class ApplicationActivityLogService {
             SubTaskEntity metadata = taskMetadata.getOrDefault(latestLog.getTaskId(),
                     new SubTaskEntity(latestLog.getTaskId(), null));
 
-            Map<String, Object> latestTaskState = new HashMap<>();
-            latestTaskState.put("taskId", Optional.ofNullable(latestLog.getTaskId()).orElse("UNKNOWN_TASK"));
-            latestTaskState.put("order", latestLog.getOrder());
-            latestTaskState.put("handledBy", latestLog.getHandledBy());
-            latestTaskState.put("createdAt", latestLog.getCreatedAt());
-            latestTaskState.put("status", latestLog.getStatus());
-            latestTaskState.put("updatedAt", latestLog.getUpdatedAt());
-            latestTaskState.put("duration", metadata.getDuration());
-            latestTaskState.put("sendbacks", metadata.getSendbacks());
-            latestTaskState.put("visited", metadata.getVisited());
-
             log.info("[buildLatestTaskStateResponse] Latest task state recorded for taskId {}", latestLog.getTaskId());
-            return latestTaskState;
+
+            return LatestTaskStateDTO.builder()
+                    .taskId(Optional.ofNullable(latestLog.getTaskId()).orElse("UNKNOWN_TASK"))
+                    .order(latestLog.getOrder())
+                    .handledBy(latestLog.getHandledBy())
+                    .createdAt(latestLog.getCreatedAt())
+                    .status(latestLog.getStatus().toString())
+                    .updatedAt(latestLog.getUpdatedAt())
+                    .duration(metadata.getDuration())
+                    .sendbacks(metadata.getSendbacks())
+                    .visited(metadata.getVisited())
+                    .build();
         } else {
             return null;
         }
     }
-
 
     private TaskResponse createTaskResponse(List<TaskExecutionLog> logs,
                                             Map<String, SubTaskEntity> taskMetadata,
@@ -279,7 +267,6 @@ public class ApplicationActivityLogService {
         }
         return null;
     }
-
 
     private String fetchSourceModule(TaskExecutionLog applicationLog) {
         log.info("[fetchSourceModule] Fetching source module for log: {}", applicationLog.getTaskId());

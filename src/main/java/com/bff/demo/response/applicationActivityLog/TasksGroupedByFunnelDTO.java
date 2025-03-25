@@ -1,14 +1,15 @@
 package com.bff.demo.response.applicationActivityLog;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
 public class TasksGroupedByFunnelDTO {
-    private FunnelTasksResponseDTO tasksGroupedByFunnel;
-    private SendbackTasksResponseDTO sendbackTasks;
+    private LinkedHashMap<String, FunnelDataDTO> tasksGroupedByFunnel;
+    private Map<String, Map<String, Map<String, TaskResponse>>> sendbackTasks;
     private LatestTaskStateDTO latestTaskState;
 }
