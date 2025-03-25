@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Map;
 
 
-@RequestMapping("/applicationLog")
-@CrossOrigin("http://localhost:5173")
+@RequestMapping("/api/v1/applicationLog")
+//@CrossOrigin("http://localhost:5173")
 public interface ApplicationActivityLogApi {
 
     @GetMapping("/{applicationId}")

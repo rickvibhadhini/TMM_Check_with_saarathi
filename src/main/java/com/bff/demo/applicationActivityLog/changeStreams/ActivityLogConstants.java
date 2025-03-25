@@ -2,8 +2,8 @@ package com.bff.demo.applicationActivityLog.changeStreams;
 
 
 
-public final class Constants {
-    private Constants() {} 
+public final class ActivityLogConstants {
+    private ActivityLogConstants() {}
 
     public static final class TaskTypes {
         public static final String SENDBACK = "sendback";
