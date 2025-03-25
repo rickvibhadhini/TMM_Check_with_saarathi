@@ -16,6 +16,7 @@ public class SubTaskEntity {
     private int sendbacks;
     private long duration;
     private int visited;
+    private String statusoftask;
 
 
     public SubTaskEntity(String taskId, Instant createdAt) {
@@ -72,7 +73,7 @@ public class SubTaskEntity {
 
         }
 
-
+        this.statusoftask = status;
         this.updatedAt = updatedAt;
     }
 }
