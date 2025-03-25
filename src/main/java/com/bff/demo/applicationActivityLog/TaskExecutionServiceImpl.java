@@ -109,8 +109,10 @@ public class TaskExecutionServiceImpl{
                     applicationId, entityId, taskId, channel);
 
         } catch (Exception e) {
+
             log.error("Error updating task execution time for taskId: {}, funnel: {}, status: {}, channel: {}",
                     taskId, funnel, status, channel, e);
+            throw new RuntimeException("Failed to retrieve task execution with ID: " +  e);
         }
     }
 
