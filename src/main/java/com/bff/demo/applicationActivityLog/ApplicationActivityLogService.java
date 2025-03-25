@@ -268,8 +268,13 @@ public class ApplicationActivityLogService {
             String sendbackKey = sendbackMetadata.getKey();
             SendbackConfig config = sendbackConfigRepository.findBySendbackKey(sendbackKey);
 
-            if (config != null && !config.getSubReasonList().isEmpty()) {
-                return config.getSubReasonList().get(0).getTargetTaskId();
+            if (config != null && config.getSubReasonList() != null) {
+                // Find the specific subReason that matches the sendbackKey
+                return config.getSubReasonList().stream()
+                        .filter(subReason -> sendbackKey.equals(subReason.getSendbackKey()))
+                        .findFirst()
+                        .map(subReason -> subReason.getTargetTaskId())
+                        .orElse(null);
             }
         }
         return null;
