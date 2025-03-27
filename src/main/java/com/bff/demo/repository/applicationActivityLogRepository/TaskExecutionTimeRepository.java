@@ -1,7 +1,7 @@
 package com.bff.demo.repository.applicationActivityLogRepository;
 
 
-import com.bff.demo.modal.applicationActivityLogModel.TaskExecutionTimeEntity;
+import com.bff.demo.model.applicationActivityLogModel.TaskExecutionTimeEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +13,5 @@ public interface TaskExecutionTimeRepository extends MongoRepository<TaskExecuti
     Optional<TaskExecutionTimeEntity> findByApplicationIdAndEntityId(String applicationId, String entityId);
     List<TaskExecutionTimeEntity> findByChannel(String channel);
     Optional<TaskExecutionTimeEntity> findByApplicationId(String applicationId);
+
 }
