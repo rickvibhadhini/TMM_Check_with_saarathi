@@ -16,12 +16,10 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TaskExecutionServiceImpl{
-
-
-
-
+public class TaskExecutionServiceImpl {
     private final TaskExecutionTimeRepository taskExecutionTimeRepository;
+    boolean flag = false;
+
 
 
 
@@ -41,14 +39,14 @@ public class TaskExecutionServiceImpl{
                         TaskExecutionTimeEntity newEntity = new TaskExecutionTimeEntity();
                         newEntity.setApplicationId(applicationId);
                         newEntity.setEntityId(entityId);
-                        newEntity.setChannel(channel); // Set channel for new entity
-                        return taskExecutionTimeRepository.save(newEntity); // Save new entity immediately
+                        newEntity.setChannel(channel);
+                        return taskExecutionTimeRepository.save(newEntity);
                     });
 
-            // Ensure the channel is updated in existing entities
+
             taskTimeEntity.setChannel(channel);
 
-            // Select the correct list based on the funnel type
+
             List<SubTaskEntity> subTaskEntityList;
             switch (funnel.toLowerCase()) {
                 case "sourcing":
@@ -99,7 +97,14 @@ public class TaskExecutionServiceImpl{
                     });
 
 
-            subTaskEntity.updateStatus(status, updatedAt);
+            subTaskEntity.updateStatus(status, updatedAt,flag);
+            if(flag == true) {
+                flag = false;
+            }
+            if(status.equalsIgnoreCase("COMPLETED") && taskId.equalsIgnoreCase("sendback")) {
+                flag = true;
+            }
+
             taskTimeEntity.setRecordDate(updatedAt);
 
 
@@ -109,10 +114,8 @@ public class TaskExecutionServiceImpl{
                     applicationId, entityId, taskId, channel);
 
         } catch (Exception e) {
-
             log.error("Error updating task execution time for taskId: {}, funnel: {}, status: {}, channel: {}",
                     taskId, funnel, status, channel, e);
-            throw new RuntimeException("Failed to retrieve task execution with ID: " +  e);
         }
     }
 
