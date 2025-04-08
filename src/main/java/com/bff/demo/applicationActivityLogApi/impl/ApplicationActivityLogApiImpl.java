@@ -7,11 +7,13 @@ import com.bff.demo.response.APIResponse;
 import com.bff.demo.response.TasksGroupedByFunnelDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@CrossOrigin("http://localhost:5173/")
 public class ApplicationActivityLogApiImpl implements ApplicationActivityLogApi {
 
     private final ApplicationActivityLogService applicationService;

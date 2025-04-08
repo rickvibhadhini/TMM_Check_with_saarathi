@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 import static com.bff.demo.constants.BffConstant.ActivityLogConstants.*;
 import static com.bff.demo.constants.SendbackConstant.SENDBACK_TASK_ID;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -88,7 +87,7 @@ public class ApplicationActivityLogService {
     }
 
     private LinkedHashMap<String, FunnelDataDTO> buildFunnelTasksResponse(List<TaskExecutionLog> regularTasks,
-                                                                          Map<String, SubTaskEntity> taskMetadata) {
+                                                                       Map<String, SubTaskEntity> taskMetadata) {
         // Get funnel order information
         Map<String, Integer> funnelMinOrders = calculateFunnelMinOrders(regularTasks);
 
@@ -139,8 +138,8 @@ public class ApplicationActivityLogService {
     }
 
     private FunnelDataDTO buildFunnelData(String funnel,
-                                          Map<String, Map<String, List<TaskExecutionLog>>> tasksByFunnelAndId,
-                                          Map<String, SubTaskEntity> taskMetadata) {
+                                       Map<String, Map<String, List<TaskExecutionLog>>> tasksByFunnelAndId,
+                                       Map<String, SubTaskEntity> taskMetadata) {
         List<TaskResponse> funnelTasks = tasksByFunnelAndId.getOrDefault(funnel, Collections.emptyMap())
                 .entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.comparing(list -> list.get(0).getOrder())))
@@ -184,7 +183,7 @@ public class ApplicationActivityLogService {
     }
 
     private LatestTaskStateDTO buildLatestTaskStateResponse(List<TaskExecutionLog> tasks,
-                                                            Map<String, SubTaskEntity> taskMetadata) {
+                                                         Map<String, SubTaskEntity> taskMetadata) {
         TaskExecutionLog latestLog = tasks.stream()
                 .max(Comparator.comparing(TaskExecutionLog::getUpdatedAt))
                 .orElse(null);
@@ -212,8 +211,8 @@ public class ApplicationActivityLogService {
     }
 
     private TaskResponse createTaskResponse(List<TaskExecutionLog> logs,
-                                            Map<String, SubTaskEntity> taskMetadata,
-                                            boolean isSendback) {
+                                             Map<String, SubTaskEntity> taskMetadata,
+                                             boolean isSendback) {
         TaskExecutionLog firstLog = logs.get(0);
         log.info("[createTaskResponse] Creating response for taskId: {} isSendback: {}", firstLog.getTaskId(), isSendback);
 
@@ -280,20 +279,5 @@ public class ApplicationActivityLogService {
         return sendbackMetadata != null ? sendbackMetadata.getSourceSubModule() : null;
     }
 
-    private TaskDetailsResponse convertToTaskDetails(TaskExecutionLog applicationLog) {
-        log.info("[convertToTaskDetails] Converting task details for taskId: {}", applicationLog.getTaskId());
-        String targetTaskId = SENDBACK_TASK_ID.equalsIgnoreCase(applicationLog.getTaskId()) ? fetchTargetTaskId(applicationLog) : null;
 
-        return new TaskDetailsResponse(
-                Optional.ofNullable(applicationLog.getFunnel()).orElse(UNKNOWN_FUNNEL),
-                applicationLog.getActorId(),
-                applicationLog.getStatus(),
-                applicationLog.getUpdatedAt(),
-                applicationLog.getTaskId(),
-                targetTaskId,
-                0,
-                0,
-                applicationLog.getMetadata()
-        );
-    }
 }
